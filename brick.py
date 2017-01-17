@@ -1,36 +1,46 @@
 #import bpy
 
+def getMin(points = []):
+	minX = 0
+	minY = 0
+	for tp in points:
+		minX = min(minX, tp[0])
+		minY = min(minY, tp[1])
+
+	return {'X':minX, 'Y':minY}
+
+def getMax(points= []):
+	minX = 0
+	minY = 0
+	for tp in points:
+		minX = max(minX, tp[0])
+		minY = max(minY, tp[1])
+
+	return {'X':minX, 'Y':minY}
+
 if __name__ == "__main__":
 	points = [
 	(1,1),
 	(0,0),
 	(0,1),
-	(13,0)]
+	(13,-4)]
 
-
-	minX = 0
-	maxX = 0
-	minY = 0
-	maxY = 0
-	for tp in points:
-		minX = min(minX, tp[0])
-		maxX = max(maxX, tp[0])
-		minY = min(minY, tp[1])
-		maxY = max(maxY, tp[1])
-
+	mini = getMin(points)
+	maxi = getMax(points)
 	bSize = .5
 
-	index = 0
+	index = mini['X']
+	print(index)
 	
 	lsX = []
 	lsY = []
 
-	while(index <= maxX):
+	while(index <= maxi['X']):
 		lsX.append(index)
-		index = index + bSize
+		index = float(index) + bSize
 
-	index = 0
-	while(index <= maxY):
+	index = mini['Y']
+	while(index <= maxi['Y']):
 		lsY.append(index)
 		index = index + bSize
 
