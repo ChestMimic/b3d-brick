@@ -1,5 +1,10 @@
 #import bpy
 
+class Brick:
+	def __init__(self, length=4, width = 4, height = 2):
+		self.lwh = (length, width, height)
+		
+
 def getMin(points = []):
 	minX = 0
 	minY = 0
