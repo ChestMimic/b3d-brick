@@ -1,4 +1,4 @@
-#import bpy
+import bpy
 
 class Brick:
 	def __init__(self, length=4, width = 4, height = 2):
@@ -47,6 +47,9 @@ def getMax(points= []):
 		minY = max(minY, tp[1])
 
 	return {'X':minX, 'Y':minY}
+
+class BrickGeneratorOperator(bpy.types.Operator):
+	pass
 
 if __name__ == "__main__":
 	points = [
