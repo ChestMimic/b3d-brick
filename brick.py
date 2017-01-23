@@ -1,4 +1,35 @@
+# BEGIN GPL BLOCK    
+#    Generates bricks and nontextured brick structures
+#    Copyright (C) 2017  Mark Fitzgibbon
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+# END GPL BLOCK
+bl_info = {
+	"name":"Brick",
+	"description":"Generates bricks and nontextured brick structures",
+	"tracker_url":"https://github.com/ibbolia/b3d-brick/issues",
+	"version":(0,1,0),
+	"blender":(2,78,0),
+	"support":"TESTING",
+	"category":"Objects",
+	"author":"Mark Fitzgibbon"
+}
+
 import bpy, random
+
+addon_keymaps = []
 
 class Brick:
 	def __init__(self, length=4, width = 4, height = 2):
@@ -41,27 +72,6 @@ class Brick:
 				rnd = random.uniform(min, max)
 				tup.append(xyz + rnd)
 			verts.append((tup[0], tup[1], tup[2]))
-			
-
-		pass
-
-def getMin(points = []):
-	minX = 0
-	minY = 0
-	for tp in points:
-		minX = min(minX, tp[0])
-		minY = min(minY, tp[1])
-
-	return {'X':minX, 'Y':minY}
-
-def getMax(points= []):
-	minX = 0
-	minY = 0
-	for tp in points:
-		minX = max(minX, tp[0])
-		minY = max(minY, tp[1])
-
-	return {'X':minX, 'Y':minY}
 
 class BrickGeneratorOperator(bpy.types.Operator):
 	bl_idname = "object.brick"
@@ -86,7 +96,35 @@ class BrickGeneratorOperator(bpy.types.Operator):
 
 		return {'FINISHED'}
 
+def getMin(points = []):
+	minX = 0
+	minY = 0
+	for tp in points:
+		minX = min(minX, tp[0])
+		minY = min(minY, tp[1])
+
+	return {'X':minX, 'Y':minY}
+
+def getMax(points= []):
+	minX = 0
+	minY = 0
+	for tp in points:
+		minX = max(minX, tp[0])
+		minY = max(minY, tp[1])
+
+	return {'X':minX, 'Y':minY}
+
+def regster():
+	bpy.utils.register_class(BrickGeneratorOperator)
+	
+def unregister():
+	bpy.utils.unregister_class(BrickGeneratorOperator)
+	
+
 if __name__ == "__main__":
+
+	regster()
+
 	points = [
 	(1,1),
 	(0,0),
