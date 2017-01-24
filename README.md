@@ -45,7 +45,6 @@ Further Notes
 - [Blender Python API](https://docs.blender.org/api/blender_python_api_2_78a_release/) for Blender version 2.78+
 - NBrick Subdivision formula is roughly based on code by [Nathan Miller](http://wiki.theprovingground.org/blender-py-mathmesh)
 
-
 Contact
 -------
 - [Github](https://github.com/ibbolia)
