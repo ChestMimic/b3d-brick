@@ -27,21 +27,43 @@ bl_info = {
 	"author":"Mark Fitzgibbon"
 }
 
-import bpy, random
-import bmesh
+import random
 
+#Blender3D imports
+import bpy
+import bmesh
 from bpy.props import FloatProperty, IntProperty
 
+##################################
+#!        GLOBAL VARIABLES      !#
+##################################
 addon_keymaps = []
 
 
-
+##################################
+#!       CLASS DEFINITIONS      !#
+##################################
 
 class Brick:
+	'''
+	Generic Brick class
+		Contains length, width, and height 
+		Can generate vertices & faces as lists
+	'''
 	def __init__(self, length=4, width = 4, height = 2):
+		'''
+		Constructor defaults to a 4x4x2 brick
+		length - Desired length of Brick 
+		width - Desired width of Brick
+		height - Desired height of Brick
+		B3D expected to interpret as (X,Y,Z) == (length, width, height)
+		'''
 		self.lwh = (length, width, height)
 
 	def genMeshData(self):
+		'''
+		Use lwh to generate verts, edges, and faces as lists
+		'''
 		verts = []
 		edges = []
 		faces = []
@@ -56,8 +78,10 @@ class Brick:
 		verts.append((-self.lwh[0], -self.lwh[1], self.lwh[2]))	#6
 		verts.append((-self.lwh[0], -self.lwh[1], -self.lwh[2]))#7
 
+		#Edges remains empty in a correctly formed Brick
+
 		#Faces
-		#Blender determines normals by vertices in a face clockwise
+		#Blender determines normals by vertices in a face clockwise (!?! Might be reverse 2017-01-24)
 		faces.append((6,7,3,2)) #-Y (Front)
 		faces.append((1,5,4,0)) #+Y (Back)
 		faces.append((2,3,1,0)) #+X (Right)
@@ -65,12 +89,21 @@ class Brick:
 		faces.append((4,6,2,0))	#+Z (Top)
 		faces.append((3,7,5,1))	#-Z (Bottom)
 
-		self.verts = verts #randomizeVerts(verts)
+		#Assign values to self
+		self.verts = verts 
 		self.edges = edges
 		self.faces = faces
 
 class NBrick:
+	'''
+	NBrick Brick class with a known number of subdivisions
+	'''
 	def __init__(self, base = Brick(), subdivs = 1):
+		'''
+		Construct using a Brick and desired number of subdivisions
+		base - Brick object to base length, width, and height off of
+		subdivs - Number of subdivided sections. 1 is expected minimum, no divisions made
+		'''
 		self.base = base
 		self.subdivs = subdivs
 
@@ -237,7 +270,11 @@ class NBrick:
 			else:
 				count = 0
 
+##################################
+#!       CLASSLESS METHODS      !#
+##################################
 
+#TODO: Remove this, replaced with randVertsBMesh()
 def randomizeVerts(verts = [], min = -.5, max = .5):
 	lst = []
 
@@ -263,6 +300,28 @@ def randVertsBMesh(mesh, min= -.05, max = .05):
 
 	bm.to_mesh(mesh)
 	bm.free()
+
+def getMin(points = []):
+	minX = 0
+	minY = 0
+	for tp in points:
+		minX = min(minX, tp[0])
+		minY = min(minY, tp[1])
+
+	return {'X':minX, 'Y':minY}
+
+def getMax(points= []):
+	minX = 0
+	minY = 0
+	for tp in points:
+		minX = max(minX, tp[0])
+		minY = max(minY, tp[1])
+
+	return {'X':minX, 'Y':minY}
+
+##################################
+#!       BLENDER OPERATORS      !#
+##################################
 
 class BrickGeneratorOperator(bpy.types.Operator):
 	bl_idname = "object.brick"
@@ -306,23 +365,10 @@ class BrickGeneratorOperator(bpy.types.Operator):
 		
 		return {'FINISHED'}
 
-def getMin(points = []):
-	minX = 0
-	minY = 0
-	for tp in points:
-		minX = min(minX, tp[0])
-		minY = min(minY, tp[1])
 
-	return {'X':minX, 'Y':minY}
-
-def getMax(points= []):
-	minX = 0
-	minY = 0
-	for tp in points:
-		minX = max(minX, tp[0])
-		minY = max(minY, tp[1])
-
-	return {'X':minX, 'Y':minY}
+##################################
+#! REGISTER & UNREGISTER BLOCKS !#
+##################################
 
 def register():
 	bpy.utils.register_class(BrickGeneratorOperator)
@@ -340,7 +386,7 @@ def unregister():
 	#	km.keymap_items.remove(kmi)
 	addon_keymaps.clear()
 
-	
+
 
 if __name__ == "__main__":
 
