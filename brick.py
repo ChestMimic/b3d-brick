@@ -20,7 +20,7 @@ bl_info = {
 	"name":"Brick",
 	"description":"Generates bricks and nontextured brick structures",
 	"tracker_url":"https://github.com/ibbolia/b3d-brick/issues",
-	"version":(0,1,0),
+	"version":(0,2,0),
 	"blender":(2,78,0),
 	"support":"TESTING",
 	"category":"Objects",
@@ -113,180 +113,52 @@ class NBrick:
 		self.faces = []
 
 		numX  = self.subdivs + 1
-		numY = self.subdivs + 1
-		numZ = self.subdivs + 1
 
-		#Top
-		for i in range(0, numX):
-			for j in range(0, numY):
-				x = (-self.base.lwh[0]/2) + (i * (self.base.lwh[0])/self.subdivs)
-				y = (-self.base.lwh[1]/2) + (j * (self.base.lwh[1])/self.subdivs)
-				z = self.base.lwh[2]/2
+		faceIndex = 0
 
-				vrt = (x, y, z)
-				self.verts.append(vrt)
+		posit = lambda n, m: -self.base.lwh[n]/2 + (m * (self.base.lwh[n])/self.subdivs)
+		facet = lambda n, m: (self.base.lwh[n]/2) * (-1 if m%2 == 0 else 1)
 
-		count = 0
-		for i in range(0, numY * (numX-1)):
-			if count < numY - 1:
-				A = i
-				B = i + 1
-				C = (i+numY)+1
-				D = (i+ numY)
+		while(faceIndex < 6):
+			indx = len(self.verts)
 
-				face = (A, B, C, D)
-				self.faces.append(face)
-				count = count + 1
-			else:
-				count = 0
+			#XPos
+			for i in range(0, numX):
+				for j in range(0, numX):
+					#This started as a really good idea, I swear
+					x = facet(0, faceIndex) if (faceIndex is 0 or faceIndex is 1) else posit(0, (i if (faceIndex is 2 or faceIndex is 3) else j)) 
+					y = facet(1, faceIndex) if (faceIndex is 2 or faceIndex is 3) else posit(1, (i if (faceIndex is 4 or faceIndex is 5) else j)) 
+					z = facet(2, faceIndex) if (faceIndex is 4 or faceIndex is 5) else posit(2, (i if (faceIndex is 0 or faceIndex is 1) else j)) 
 
-		indx = len(self.verts)
+					vrt = (x, y, z)
+					self.verts.append(vrt)
 
-		#YPos
-		for i in range(0, numX):
-			for j in range(0, numY):
-				x = (-self.base.lwh[0]/2) + (i * (self.base.lwh[0])/self.subdivs)
-				y = self.base.lwh[1]/2
-				z = (-self.base.lwh[2]/2) + (j * (self.base.lwh[2])/self.subdivs)
+			count = 0
+			for i in range(0, numX * (numX-1)):
+				if count < numX - 1:
+					A = i + indx
+					B = i + 1 + indx
+					C = (i+numX)+1 + indx
+					D = (i+ numX) + indx
 
-				vrt = (x, y, z)
-				self.verts.append(vrt)
-
-		count = 0
-		for i in range(0, numY * (numX-1)):
-			if count < numY - 1:
-				A = i + indx
-				B = i + 1 + indx
-				C = (i+numY)+1 + indx
-				D = (i+ numY) + indx
-
-				face = (A, B, C, D)
-				self.faces.append(face)
-				count = count + 1
-			else:
-				count = 0
-
-		indx = len(self.verts)
-
-		#YNeg
-		for i in range(0, numX):
-			for j in range(0, numY):
-				x = (-self.base.lwh[0]/2) + (i * (self.base.lwh[0])/self.subdivs)
-				y = -self.base.lwh[1]/2
-				z = (-self.base.lwh[2]/2) + (j * (self.base.lwh[2])/self.subdivs)
-
-				vrt = (x, y, z)
-				self.verts.append(vrt)
-
-		count = 0
-		for i in range(0, numY * (numX-1)):
-			if count < numY - 1:
-				A = i + indx
-				B = i + 1 + indx
-				C = (i+numY)+1 + indx
-				D = (i+ numY) + indx
-
-				face = (A, B, C, D)
-				self.faces.append(face)
-				count = count + 1
-			else:
-				count = 0
-
-		indx = len(self.verts)
-
-		#XPos
-		for i in range(0, numX):
-			for j in range(0, numY):
-				x = self.base.lwh[0]/2
-				y = (-self.base.lwh[1]/2) + (i * (self.base.lwh[1])/self.subdivs)
-				z = (-self.base.lwh[2]/2) + (j * (self.base.lwh[2])/self.subdivs)
-
-				vrt = (x, y, z)
-				self.verts.append(vrt)
-
-		count = 0
-		for i in range(0, numY * (numX-1)):
-			if count < numY - 1:
-				A = i + indx
-				B = i + 1 + indx
-				C = (i+numY)+1 + indx
-				D = (i+ numY) + indx
-
-				face = (A, B, C, D)
-				self.faces.append(face)
-				count = count + 1
-			else:
-				count = 0
-
-
-		indx = len(self.verts)
-
-		#XNeg
-		for i in range(0, numX):
-			for j in range(0, numY):
-				x = -self.base.lwh[0]/2
-				y = (-self.base.lwh[1]/2) + (i * (self.base.lwh[1])/self.subdivs)
-				z = (-self.base.lwh[2]/2) + (j * (self.base.lwh[2])/self.subdivs)
-
-				vrt = (x, y, z)
-				self.verts.append(vrt)
-
-		count = 0
-		for i in range(0, numY * (numX-1)):
-			if count < numY - 1:
-				A = i + indx
-				B = i + 1 + indx
-				C = (i+numY)+1 + indx
-				D = (i+ numY) + indx
-
-				face = (A, B, C, D)
-				self.faces.append(face)
-				count = count + 1
-			else:
-				count = 0
-
-		indx = len(self.verts)
-
-		for i in range(0, numX):
-			for j in range(0, numY):
-				x = (-self.base.lwh[0]/2) + (i * (self.base.lwh[0])/self.subdivs)
-				y = (-self.base.lwh[1]/2) + (j * (self.base.lwh[1])/self.subdivs)
-				z = -self.base.lwh[2]/2
-
-				vrt = (x, y, z)
-				self.verts.append(vrt)
-
-		count = 0
-		for i in range(0, numY * (numX-1)):
-			if count < numY - 1:
-				A = i + indx
-				B = i + 1 + indx
-				C = (i+numY)+1 + indx
-				D = (i+ numY) + indx
-
-				face = (A, B, C, D)
-				self.faces.append(face)
-				count = count + 1
-			else:
-				count = 0
+					face = (A, B, C, D)
+					self.faces.append(face)
+					count = count + 1
+				else:
+					count = 0
+			faceIndex = faceIndex + 1
 
 ##################################
 #!       CLASSLESS METHODS      !#
 ##################################
 
-#TODO: Remove this, replaced with randVertsBMesh()
-def randomizeVerts(verts = [], min = -.5, max = .5):
-	lst = []
-
-	for vtx in verts:
-		tup = []
-		for xyz in vtx:
-			rnd = random.uniform(min, max)
-			tup.append(xyz + rnd)
-		lst.append((tup[0], tup[1], tup[2]))
-	return lst
-
-def randVertsBMesh(mesh, min= -.05, max = .05):
+def randVertsBMesh(mesh, ran= .05, seed = 0):
+	'''
+	Apply noise to mesh
+	ran - range of random values, from negative ran to positive ran
+	seed - seed value to use with random
+	'''
+	random.seed(seed)
 	bm = bmesh.new()
 	bm.from_mesh(mesh)
 
@@ -294,9 +166,9 @@ def randVertsBMesh(mesh, min= -.05, max = .05):
 	bmesh.ops.recalc_face_normals(bm, faces = bm.faces)
 
 	for v in bm.verts:
-		v.co.x += random.uniform(min, max)
-		v.co.y += random.uniform(min, max)
-		v.co.z += random.uniform(min, max)
+		v.co.x += random.uniform(-ran, ran)
+		v.co.y += random.uniform(-ran, ran)
+		v.co.z += random.uniform(-ran, ran)
 
 	bm.to_mesh(mesh)
 	bm.free()
@@ -342,6 +214,12 @@ class BrickGeneratorOperator(bpy.types.Operator):
 	height = FloatProperty(
 		name = "height",
 		default = 1.0)
+	intensity = FloatProperty(
+		name = "Noise Intensity",
+		default = 0.05)
+	seed = IntProperty(
+		name="Random Seed",
+		default = 0)
 
 	def execute(self, context):
 		#Create mesh data
@@ -350,7 +228,7 @@ class BrickGeneratorOperator(bpy.types.Operator):
 		samp_brick = NBrick(br, self.subds)
 		samp_brick.genMeshData()
 		mesh_data.from_pydata(samp_brick.verts, samp_brick.edges, samp_brick.faces)
-		randVertsBMesh(mesh_data)
+		randVertsBMesh(mesh_data, self.intensity, self.seed)
 
 		mesh_data.update()
 
@@ -362,9 +240,7 @@ class BrickGeneratorOperator(bpy.types.Operator):
 		scene = bpy.context.scene
 		scene.objects.link(obj)
 
-		
 		return {'FINISHED'}
-
 
 ##################################
 #! REGISTER & UNREGISTER BLOCKS !#
@@ -390,7 +266,7 @@ def unregister():
 
 if __name__ == "__main__":
 
-	regster()
+	register()
 
 	points = [
 	(1,1),
