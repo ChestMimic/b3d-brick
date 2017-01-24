@@ -28,8 +28,14 @@ bl_info = {
 }
 
 import bpy, random
+import bmesh
+
+from bpy.props import FloatProperty, IntProperty
 
 addon_keymaps = []
+
+
+
 
 class Brick:
 	def __init__(self, length=4, width = 4, height = 2):
@@ -59,31 +65,101 @@ class Brick:
 		faces.append((4,6,2,0))	#+Z (Top)
 		faces.append((3,7,5,1))	#-Z (Bottom)
 
-		self.verts = verts
+		self.verts = verts #randomizeVerts(verts)
 		self.edges = edges
 		self.faces = faces
 
-	def randomizeVerts(self, min = -.5, max = .5):
-		verts = []
+class NBrick:
+	def __init__(self, base = Brick(), subdivs = 1):
+		self.base = base
+		self.subdivs = subdivs
 
-		for vtx in self.verts:
-			tup = []
-			for xyz in vtx:
-				rnd = random.uniform(min, max)
-				tup.append(xyz + rnd)
-			verts.append((tup[0], tup[1], tup[2]))
+	def genMeshData(self):
+		self.verts = []
+		self.edges= []
+		self.faces = []
+
+		numX  = self.subdivs + 1
+		numY = self.subdivs + 1
+		numZ = self.subdivs + 1
+
+		#Top
+		for i in range(0, numX):
+			for j in range(0, numY):
+				x = (-self.base.lwh[0]/2) + (i * (self.base.lwh[0])/self.subdivs)
+				y = (-self.base.lwh[1]/2) + (j * (self.base.lwh[1])/self.subdivs)
+				z = self.base.lwh[2]/2
+
+				vrt = (x, y, z)
+				self.verts.append(vrt)
+
+		count = 0
+		for i in range(0, numY * (numX-1)):
+			if count < numY - 1:
+				A = i
+				B = i + 1
+				C = (i+numY)+1
+				D = (i+ numY)
+
+				face = (A, B, C, D)
+				self.faces.append(face)
+				count = count + 1
+			else:
+				count = 0
+
+def randomizeVerts(verts = [], min = -.5, max = .5):
+	lst = []
+
+	for vtx in verts:
+		tup = []
+		for xyz in vtx:
+			rnd = random.uniform(min, max)
+			tup.append(xyz + rnd)
+		lst.append((tup[0], tup[1], tup[2]))
+	return lst
+
+def randVertsBMesh(mesh, min= -.5, max = .5):
+	bm = bmesh.new()
+	bm.from_mesh(mesh)
+
+	for v in bm.verts:
+		v.co.x += random.uniform(min, max)
+		v.co.y += random.uniform(min, max)
+		v.co.z += random.uniform(min, max)
+
+	bm.to_mesh(mesh)
+	bm.free()
 
 class BrickGeneratorOperator(bpy.types.Operator):
 	bl_idname = "object.brick"
 	bl_label = "Brick"
 	bl_options = {'REGISTER', 'UNDO'}
 
+	subds = IntProperty(
+		name= "Subdivisions",
+		min = 1,
+		default = 1)
+
+	length = FloatProperty(
+		name = "length",
+		default = 1.0)
+	width = FloatProperty(
+		name = "width",
+		default = 2.0)
+	height = FloatProperty(
+		name = "height",
+		default = 1.0)
+
 	def execute(self, context):
 		#Create mesh data
 		mesh_data = bpy.data.meshes.new("brick_mesh_data")
-		samp_brick = Brick()
+		br = Brick(self.length, self.width, self.height)
+		samp_brick = NBrick(br, self.subds)
 		samp_brick.genMeshData()
 		mesh_data.from_pydata(samp_brick.verts, samp_brick.edges, samp_brick.faces)
+		#mesh_data.subdivide()
+		#randVertsBMesh(mesh_data)
+
 		mesh_data.update()
 
 		#create blender object
@@ -94,6 +170,7 @@ class BrickGeneratorOperator(bpy.types.Operator):
 		scene = bpy.context.scene
 		scene.objects.link(obj)
 
+		
 		return {'FINISHED'}
 
 def getMin(points = []):
@@ -116,9 +193,20 @@ def getMax(points= []):
 
 def register():
 	bpy.utils.register_class(BrickGeneratorOperator)
+
+	wm = bpy.context.window_manager
+	km = wm.keyconfigs.addon.keymaps.new(name='Object Mode', space_type='EMPTY')
+	#kmi = km.keymap_items.new(BrickGeneratorOperator.bl_idname, 'SPACE', 'PRESS', ctrl=False, shift=False)
+	#kmi.properties.subds = 1
+	addon_keymaps.append(km)
 	
 def unregister():
 	bpy.utils.unregister_class(BrickGeneratorOperator)
+	#bpy.types.INFO_MT_add.remove(add_MirrorBox_button)
+	#for km, kmi in addon_keymaps:
+	#	km.keymap_items.remove(kmi)
+	addon_keymaps.clear()
+
 	
 
 if __name__ == "__main__":
