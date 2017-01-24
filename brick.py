@@ -52,12 +52,12 @@ class Brick:
 
 		#Faces
 		#Blender determines normals by vertices in a face clockwise
-		faces.append((2,3,7,6)) #-Y (Front)
-		faces.append((0,4,5,1)) #+Y (Back)
-		faces.append((0,1,3,2)) #+X (Right)
-		faces.append((5,4,6,7))	#-X (Left)
-		faces.append((0,2,6,4))	#+Z (Top)
-		faces.append((1,5,7,3))	#-Z (Bottom)
+		faces.append((6,7,3,2)) #-Y (Front)
+		faces.append((1,5,4,0)) #+Y (Back)
+		faces.append((2,3,1,0)) #+X (Right)
+		faces.append((7,6,4,5))	#-X (Left)
+		faces.append((4,6,2,0))	#+Z (Top)
+		faces.append((3,7,5,1))	#-Z (Bottom)
 
 		self.verts = verts
 		self.edges = edges
@@ -114,7 +114,7 @@ def getMax(points= []):
 
 	return {'X':minX, 'Y':minY}
 
-def regster():
+def register():
 	bpy.utils.register_class(BrickGeneratorOperator)
 	
 def unregister():
