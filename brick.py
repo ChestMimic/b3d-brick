@@ -107,6 +107,137 @@ class NBrick:
 			else:
 				count = 0
 
+		indx = len(self.verts)
+
+		#YPos
+		for i in range(0, numX):
+			for j in range(0, numY):
+				x = (-self.base.lwh[0]/2) + (i * (self.base.lwh[0])/self.subdivs)
+				y = self.base.lwh[1]/2
+				z = (-self.base.lwh[2]/2) + (j * (self.base.lwh[2])/self.subdivs)
+
+				vrt = (x, y, z)
+				self.verts.append(vrt)
+
+		count = 0
+		for i in range(0, numY * (numX-1)):
+			if count < numY - 1:
+				A = i + indx
+				B = i + 1 + indx
+				C = (i+numY)+1 + indx
+				D = (i+ numY) + indx
+
+				face = (A, B, C, D)
+				self.faces.append(face)
+				count = count + 1
+			else:
+				count = 0
+
+		indx = len(self.verts)
+
+		#YNeg
+		for i in range(0, numX):
+			for j in range(0, numY):
+				x = (-self.base.lwh[0]/2) + (i * (self.base.lwh[0])/self.subdivs)
+				y = -self.base.lwh[1]/2
+				z = (-self.base.lwh[2]/2) + (j * (self.base.lwh[2])/self.subdivs)
+
+				vrt = (x, y, z)
+				self.verts.append(vrt)
+
+		count = 0
+		for i in range(0, numY * (numX-1)):
+			if count < numY - 1:
+				A = i + indx
+				B = i + 1 + indx
+				C = (i+numY)+1 + indx
+				D = (i+ numY) + indx
+
+				face = (A, B, C, D)
+				self.faces.append(face)
+				count = count + 1
+			else:
+				count = 0
+
+		indx = len(self.verts)
+
+		#XPos
+		for i in range(0, numX):
+			for j in range(0, numY):
+				x = self.base.lwh[0]/2
+				y = (-self.base.lwh[1]/2) + (i * (self.base.lwh[1])/self.subdivs)
+				z = (-self.base.lwh[2]/2) + (j * (self.base.lwh[2])/self.subdivs)
+
+				vrt = (x, y, z)
+				self.verts.append(vrt)
+
+		count = 0
+		for i in range(0, numY * (numX-1)):
+			if count < numY - 1:
+				A = i + indx
+				B = i + 1 + indx
+				C = (i+numY)+1 + indx
+				D = (i+ numY) + indx
+
+				face = (A, B, C, D)
+				self.faces.append(face)
+				count = count + 1
+			else:
+				count = 0
+
+
+		indx = len(self.verts)
+
+		#XNeg
+		for i in range(0, numX):
+			for j in range(0, numY):
+				x = -self.base.lwh[0]/2
+				y = (-self.base.lwh[1]/2) + (i * (self.base.lwh[1])/self.subdivs)
+				z = (-self.base.lwh[2]/2) + (j * (self.base.lwh[2])/self.subdivs)
+
+				vrt = (x, y, z)
+				self.verts.append(vrt)
+
+		count = 0
+		for i in range(0, numY * (numX-1)):
+			if count < numY - 1:
+				A = i + indx
+				B = i + 1 + indx
+				C = (i+numY)+1 + indx
+				D = (i+ numY) + indx
+
+				face = (A, B, C, D)
+				self.faces.append(face)
+				count = count + 1
+			else:
+				count = 0
+
+		indx = len(self.verts)
+
+		for i in range(0, numX):
+			for j in range(0, numY):
+				x = (-self.base.lwh[0]/2) + (i * (self.base.lwh[0])/self.subdivs)
+				y = (-self.base.lwh[1]/2) + (j * (self.base.lwh[1])/self.subdivs)
+				z = -self.base.lwh[2]/2
+
+				vrt = (x, y, z)
+				self.verts.append(vrt)
+
+		count = 0
+		for i in range(0, numY * (numX-1)):
+			if count < numY - 1:
+				A = i + indx
+				B = i + 1 + indx
+				C = (i+numY)+1 + indx
+				D = (i+ numY) + indx
+
+				face = (A, B, C, D)
+				self.faces.append(face)
+				count = count + 1
+			else:
+				count = 0
+
+
 def randomizeVerts(verts = [], min = -.5, max = .5):
 	lst = []
 
@@ -118,9 +249,12 @@ def randomizeVerts(verts = [], min = -.5, max = .5):
 		lst.append((tup[0], tup[1], tup[2]))
 	return lst
 
-def randVertsBMesh(mesh, min= -.5, max = .5):
+def randVertsBMesh(mesh, min= -.05, max = .05):
 	bm = bmesh.new()
 	bm.from_mesh(mesh)
+
+	bmesh.ops.automerge(bm, verts = bm.verts, dist = 0.001)
+	bmesh.ops.recalc_face_normals(bm, faces = bm.faces)
 
 	for v in bm.verts:
 		v.co.x += random.uniform(min, max)
@@ -157,8 +291,7 @@ class BrickGeneratorOperator(bpy.types.Operator):
 		samp_brick = NBrick(br, self.subds)
 		samp_brick.genMeshData()
 		mesh_data.from_pydata(samp_brick.verts, samp_brick.edges, samp_brick.faces)
-		#mesh_data.subdivide()
-		#randVertsBMesh(mesh_data)
+		randVertsBMesh(mesh_data)
 
 		mesh_data.update()
 
