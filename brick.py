@@ -20,7 +20,7 @@ bl_info = {
 	"name":"Brick",
 	"description":"Generates bricks and nontextured brick structures",
 	"tracker_url":"https://github.com/ibbolia/b3d-brick/issues",
-	"version":(0,1,0),
+	"version":(0,2,0),
 	"blender":(2,78,0),
 	"support":"TESTING",
 	"category":"Objects",
@@ -116,7 +116,7 @@ class NBrick:
 
 		faceIndex = 0
 
-		posit = lambda n: -self.base.lwh[n]/2 + (i * (self.base.lwh[n])/self.subdivs)
+		posit = lambda n, m: -self.base.lwh[n]/2 + (m * (self.base.lwh[n])/self.subdivs)
 		facet = lambda n, m: (self.base.lwh[n]/2) * (-1 if m%2 == 0 else 1)
 
 		while(faceIndex < 6):
@@ -125,9 +125,10 @@ class NBrick:
 			#XPos
 			for i in range(0, numX):
 				for j in range(0, numX):
-					x = facet(0, faceIndex) if (faceIndex is 0 or faceIndex is 1) else posit(0) 
-					y = facet(1, faceIndex) if (faceIndex is 2 or faceIndex is 3) else posit(1) 
-					z = facet(2, faceIndex) if (faceIndex is 4 or faceIndex is 5) else posit(2) 
+					#This started as a really good idea, I swear
+					x = facet(0, faceIndex) if (faceIndex is 0 or faceIndex is 1) else posit(0, (i if (faceIndex is 2 or faceIndex is 3) else j)) 
+					y = facet(1, faceIndex) if (faceIndex is 2 or faceIndex is 3) else posit(1, (i if (faceIndex is 4 or faceIndex is 5) else j)) 
+					z = facet(2, faceIndex) if (faceIndex is 4 or faceIndex is 5) else posit(2, (i if (faceIndex is 0 or faceIndex is 1) else j)) 
 
 					vrt = (x, y, z)
 					self.verts.append(vrt)
@@ -218,7 +219,7 @@ class BrickGeneratorOperator(bpy.types.Operator):
 		default = 0.05)
 	seed = IntProperty(
 		name="Random Seed",
-		default = random.seed())
+		default = 0)
 
 	def execute(self, context):
 		#Create mesh data

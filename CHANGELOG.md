@@ -1,7 +1,7 @@
 #Change Log
 All notable changes will be tracked in this file
 
-##[Unreleased]
+##[0.2] - 2017-01-24
 ###Added
 - README
 - CHANGELOG
@@ -9,11 +9,13 @@ All notable changes will be tracked in this file
 
 ###Changed
 - randVertsBMesh now explicitly uses range of -n to +n
+- algorithm for NBrick.genMeshData reduced line count
+- Seed now dependent on NBrick keymap value (previously time based)
 
 ###Removed
 - randomizeVerts
 
-##[Prehistoric] - 2017-01-24
+##[0.1] - 2017-01-23
 ###Added
 - Brick class (deprecated)
 - Nbrick class

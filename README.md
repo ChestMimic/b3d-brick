@@ -1,6 +1,6 @@
 Brick Addon (Working Title)
 ================
-Version 0.1
+Version 0.2
 -----------
 (c) Mark Fitzgibbon 2017
 
@@ -32,9 +32,13 @@ Add-on is only in "Testing" supported level
 
 Usage
 --------
+Script currently only available through spacebar menu (named "Brick")
 
-Significant Known Issues
-------------
+User can generate an NBrick at cursor location and set variables:
+- Subdivisions: Number of subdivisions to form in brick
+- length, width, height: standard size values of brick object
+- Noise intensity: Amount of variation for vertex noise
+- Seed: Seed value for random calculations
 
 Contact
 -------
