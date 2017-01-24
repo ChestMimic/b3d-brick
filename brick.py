@@ -108,39 +108,46 @@ class NBrick:
 		self.subdivs = subdivs
 
 	def genMeshData(self):
+		'''
+		Create Blender compatible lists for vertex and face data
+		'''
+
+		#Self-assign empty lists
 		self.verts = []
 		self.edges= []
 		self.faces = []
 
+		#1 Subdivision level creates 2 edges per axis
 		numX  = self.subdivs + 1
 
 		faceIndex = 0
 
+		#Lambdas defining single axis coordinate positioning
 		posit = lambda n, m: -self.base.lwh[n]/2 + (m * (self.base.lwh[n])/self.subdivs)
 		facet = lambda n, m: (self.base.lwh[n]/2) * (-1 if m%2 == 0 else 1)
 
+		#Each face of a cuboid
 		while(faceIndex < 6):
+			#Starting point of side's vertices
 			indx = len(self.verts)
 
-			#XPos
+			#Iterate through a plane
 			for i in range(0, numX):
 				for j in range(0, numX):
 					#This started as a really good idea, I swear
 					x = facet(0, faceIndex) if (faceIndex is 0 or faceIndex is 1) else posit(0, (i if (faceIndex is 2 or faceIndex is 3) else j)) 
 					y = facet(1, faceIndex) if (faceIndex is 2 or faceIndex is 3) else posit(1, (i if (faceIndex is 4 or faceIndex is 5) else j)) 
 					z = facet(2, faceIndex) if (faceIndex is 4 or faceIndex is 5) else posit(2, (i if (faceIndex is 0 or faceIndex is 1) else j)) 
-
 					vrt = (x, y, z)
 					self.verts.append(vrt)
-
 			count = 0
 			for i in range(0, numX * (numX-1)):
 				if count < numX - 1:
+					#Circle around vertexes with a knonw order in a list
 					A = i + indx
 					B = i + 1 + indx
 					C = (i+numX)+1 + indx
 					D = (i+ numX) + indx
-
 					face = (A, B, C, D)
 					self.faces.append(face)
 					count = count + 1
@@ -162,14 +169,17 @@ def randVertsBMesh(mesh, ran= .05, seed = 0):
 	bm = bmesh.new()
 	bm.from_mesh(mesh)
 
+	#Correct mesh errors caused by genMeshData 
 	bmesh.ops.automerge(bm, verts = bm.verts, dist = 0.001)
 	bmesh.ops.recalc_face_normals(bm, faces = bm.faces)
 
+	#For each vertice randomize addition
 	for v in bm.verts:
 		v.co.x += random.uniform(-ran, ran)
 		v.co.y += random.uniform(-ran, ran)
 		v.co.z += random.uniform(-ran, ran)
 
+	#Apply modifications to mesh
 	bm.to_mesh(mesh)
 	bm.free()
 
@@ -194,7 +204,6 @@ def getMax(points= []):
 ##################################
 #!       BLENDER OPERATORS      !#
 ##################################
-
 class BrickGeneratorOperator(bpy.types.Operator):
 	bl_idname = "object.brick"
 	bl_label = "Brick"
@@ -204,7 +213,6 @@ class BrickGeneratorOperator(bpy.types.Operator):
 		name= "Subdivisions",
 		min = 1,
 		default = 1)
-
 	length = FloatProperty(
 		name = "length",
 		default = 1.0)
@@ -248,24 +256,15 @@ class BrickGeneratorOperator(bpy.types.Operator):
 
 def register():
 	bpy.utils.register_class(BrickGeneratorOperator)
-
 	wm = bpy.context.window_manager
 	km = wm.keyconfigs.addon.keymaps.new(name='Object Mode', space_type='EMPTY')
-	#kmi = km.keymap_items.new(BrickGeneratorOperator.bl_idname, 'SPACE', 'PRESS', ctrl=False, shift=False)
-	#kmi.properties.subds = 1
 	addon_keymaps.append(km)
 	
 def unregister():
 	bpy.utils.unregister_class(BrickGeneratorOperator)
-	#bpy.types.INFO_MT_add.remove(add_MirrorBox_button)
-	#for km, kmi in addon_keymaps:
-	#	km.keymap_items.remove(kmi)
 	addon_keymaps.clear()
 
-
-
 if __name__ == "__main__":
-
 	register()
 
 	points = [
