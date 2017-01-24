@@ -6,7 +6,7 @@ Version 0.2
 
 Description
 -----------
-Generates a square object in Blender 3D with random nose applied to vertices
+Generates a square object in Blender 3D with variable random nose applied to vertices
 Script is provided as-is
 
 Download
@@ -39,6 +39,12 @@ User can generate an NBrick at cursor location and set variables:
 - length, width, height: standard size values of brick object
 - Noise intensity: Amount of variation for vertex noise
 - Seed: Seed value for random calculations
+
+Further Notes
+-------------
+- [Blender Python API](https://docs.blender.org/api/blender_python_api_2_78a_release/) for Blender version 2.78+
+- NBrick Subdivision formula is roughly based on code by [Nathan Miller](http://wiki.theprovingground.org/blender-py-mathmesh)
+
 
 Contact
 -------
