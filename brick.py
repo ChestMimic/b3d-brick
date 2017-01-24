@@ -274,19 +274,13 @@ class NBrick:
 #!       CLASSLESS METHODS      !#
 ##################################
 
-#TODO: Remove this, replaced with randVertsBMesh()
-def randomizeVerts(verts = [], min = -.5, max = .5):
-	lst = []
-
-	for vtx in verts:
-		tup = []
-		for xyz in vtx:
-			rnd = random.uniform(min, max)
-			tup.append(xyz + rnd)
-		lst.append((tup[0], tup[1], tup[2]))
-	return lst
-
-def randVertsBMesh(mesh, min= -.05, max = .05):
+def randVertsBMesh(mesh, ran= .05, seed = 0):
+	'''
+	Apply noise to mesh
+	ran - range of random values, from negative ran to positive ran
+	seed - seed value to use with random
+	'''
+	random.seed(seed)
 	bm = bmesh.new()
 	bm.from_mesh(mesh)
 
@@ -294,9 +288,9 @@ def randVertsBMesh(mesh, min= -.05, max = .05):
 	bmesh.ops.recalc_face_normals(bm, faces = bm.faces)
 
 	for v in bm.verts:
-		v.co.x += random.uniform(min, max)
-		v.co.y += random.uniform(min, max)
-		v.co.z += random.uniform(min, max)
+		v.co.x += random.uniform(-ran, ran)
+		v.co.y += random.uniform(-ran, ran)
+		v.co.z += random.uniform(-ran, ran)
 
 	bm.to_mesh(mesh)
 	bm.free()
@@ -342,6 +336,12 @@ class BrickGeneratorOperator(bpy.types.Operator):
 	height = FloatProperty(
 		name = "height",
 		default = 1.0)
+	intensity = FloatProperty(
+		name = "Noise Intensity",
+		default = 0.05)
+	seed = IntProperty(
+		name="Random Seed",
+		default = random.seed())
 
 	def execute(self, context):
 		#Create mesh data
@@ -350,7 +350,7 @@ class BrickGeneratorOperator(bpy.types.Operator):
 		samp_brick = NBrick(br, self.subds)
 		samp_brick.genMeshData()
 		mesh_data.from_pydata(samp_brick.verts, samp_brick.edges, samp_brick.faces)
-		randVertsBMesh(mesh_data)
+		randVertsBMesh(mesh_data, self.intensity, self.seed)
 
 		mesh_data.update()
 
@@ -362,9 +362,7 @@ class BrickGeneratorOperator(bpy.types.Operator):
 		scene = bpy.context.scene
 		scene.objects.link(obj)
 
-		
 		return {'FINISHED'}
-
 
 ##################################
 #! REGISTER & UNREGISTER BLOCKS !#
@@ -390,7 +388,7 @@ def unregister():
 
 if __name__ == "__main__":
 
-	regster()
+	register()
 
 	points = [
 	(1,1),
