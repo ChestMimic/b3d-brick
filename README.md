@@ -23,8 +23,11 @@ Install
 -------
 User wishing to install as and addon to blender should perform the following:
 1. Zip folder (if not already done) 
+
 2. Open Blender program
+
 3. Navigate to File > User Preferences > Add-ons
+
 4. Install from file
 
 Alternatively, User can install addon files directly in Blender's addon folder
