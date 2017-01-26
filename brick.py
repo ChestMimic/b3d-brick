@@ -27,6 +27,9 @@ bl_info = {
 	"author":"Mark Fitzgibbon"
 }
 
+##################################
+#!            IMPORTS           !#
+##################################
 import random
 
 #Blender3D imports
@@ -159,30 +162,6 @@ class NBrick:
 #!       CLASSLESS METHODS      !#
 ##################################
 
-def randVertsBMesh(mesh, ran= .05, seed = 0):
-	'''
-	Apply noise to mesh
-	ran - range of random values, from negative ran to positive ran
-	seed - seed value to use with random
-	'''
-	random.seed(seed)
-	bm = bmesh.new()
-	bm.from_mesh(mesh)
-
-	#Correct mesh errors caused by genMeshData 
-	bmesh.ops.automerge(bm, verts = bm.verts, dist = 0.001)
-	bmesh.ops.recalc_face_normals(bm, faces = bm.faces)
-
-	#For each vertice randomize addition
-	for v in bm.verts:
-		v.co.x += random.uniform(-ran, ran)
-		v.co.y += random.uniform(-ran, ran)
-		v.co.z += random.uniform(-ran, ran)
-
-	#Apply modifications to mesh
-	bm.to_mesh(mesh)
-	bm.free()
-
 def getMin(points = []):
 	minX = 0
 	minY = 0
@@ -229,6 +208,30 @@ class BrickGeneratorOperator(bpy.types.Operator):
 		name="Random Seed",
 		default = 0)
 
+	def randVertsBMesh(mesh, ran= .05, seed = 0):
+		'''
+		Apply noise to mesh
+		ran - range of random values, from negative ran to positive ran
+		seed - seed value to use with random
+		'''
+		random.seed(seed)
+		bm = bmesh.new()
+		bm.from_mesh(mesh)
+
+		#Correct mesh errors caused by genMeshData 
+		bmesh.ops.automerge(bm, verts = bm.verts, dist = 0.001)
+		bmesh.ops.recalc_face_normals(bm, faces = bm.faces)
+
+		#For each vertice randomize addition
+		for v in bm.verts:
+			v.co.x += random.uniform(-ran, ran)
+			v.co.y += random.uniform(-ran, ran)
+			v.co.z += random.uniform(-ran, ran)
+
+		#Apply modifications to mesh
+		bm.to_mesh(mesh)
+		bm.free()
+
 	def execute(self, context):
 		#Create mesh data
 		mesh_data = bpy.data.meshes.new("brick_mesh_data")
@@ -236,7 +239,7 @@ class BrickGeneratorOperator(bpy.types.Operator):
 		samp_brick = NBrick(br, self.subds)
 		samp_brick.genMeshData()
 		mesh_data.from_pydata(samp_brick.verts, samp_brick.edges, samp_brick.faces)
-		randVertsBMesh(mesh_data, self.intensity, self.seed)
+		self.randVertsBMesh(mesh_data, self.intensity, self.seed)
 
 		mesh_data.update()
 

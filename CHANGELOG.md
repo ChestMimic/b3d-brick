@@ -1,6 +1,10 @@
 #Change Log
 All notable changes will be tracked in this file
 
+##[Unreleased]
+###Changed
+- randVertsBMesh made a function of BrickGeneratorOperator
+
 ##[0.2] - 2017-01-24
 ###Added
 - README
