@@ -48,11 +48,15 @@ addon_keymaps = []
 ##################################
 
 class Tile:
-	def __init__(self, base=(4,4,2), subdivs = 1):
+	def __init__(self, base=(4,4,2), subdivs = 1, margin = 0):
 		self.base = base
 		self.subdivs = subdivs
+		self.margin = margin
 
 	def genMeshData(self):
+		self.verts = []
+		self.edges= []
+		self.faces = []
 		pass
 
 class NBrick:
@@ -121,8 +125,8 @@ class NBrick:
 ##################################
 
 def getMin(points = []):
-	minX = 0
-	minY = 0
+	minX = 9999999999
+	minY = 9999999999
 	for tp in points:
 		minX = min(minX, tp[0])
 		minY = min(minY, tp[1])
@@ -130,8 +134,8 @@ def getMin(points = []):
 	return {'X':minX, 'Y':minY}
 
 def getMax(points= []):
-	minX = 0
-	minY = 0
+	minX = -999999999
+	minY = -999999999
 	for tp in points:
 		minX = max(minX, tp[0])
 		minY = max(minY, tp[1])

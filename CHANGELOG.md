@@ -4,7 +4,8 @@ All notable changes will be tracked in this file
 ##[Unreleased]
 ###Added
 - Function newBrick to BrickGeneratorOperator 
-- WallGeneratorOperator
+- WallGeneratorOperator class
+- Tile class
 - Add Brick button to Add menu
 
 ###Changed
