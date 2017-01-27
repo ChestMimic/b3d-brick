@@ -47,61 +47,11 @@ addon_keymaps = []
 #!       CLASS DEFINITIONS      !#
 ##################################
 
-class Brick:
-	'''
-	Generic Brick class
-		Contains length, width, and height 
-		Can generate vertices & faces as lists
-	'''
-	def __init__(self, length=4, width = 4, height = 2):
-		'''
-		Constructor defaults to a 4x4x2 brick
-		length - Desired length of Brick 
-		width - Desired width of Brick
-		height - Desired height of Brick
-		B3D expected to interpret as (X,Y,Z) == (length, width, height)
-		'''
-		self.lwh = (length, width, height)
-
-	def genMeshData(self):
-		'''
-		Use lwh to generate verts, edges, and faces as lists
-		'''
-		verts = []
-		edges = []
-		faces = []
-
-		#Vertexes
-		verts.append((self.lwh[0], self.lwh[1], self.lwh[2]))	#0
-		verts.append((self.lwh[0], self.lwh[1], -self.lwh[2]))	#1
-		verts.append((self.lwh[0], -self.lwh[1], self.lwh[2]))	#2
-		verts.append((self.lwh[0], -self.lwh[1], -self.lwh[2]))	#3
-		verts.append((-self.lwh[0], self.lwh[1], self.lwh[2]))	#4
-		verts.append((-self.lwh[0], self.lwh[1], -self.lwh[2]))	#5
-		verts.append((-self.lwh[0], -self.lwh[1], self.lwh[2]))	#6
-		verts.append((-self.lwh[0], -self.lwh[1], -self.lwh[2]))#7
-
-		#Edges remains empty in a correctly formed Brick
-
-		#Faces
-		#Blender determines normals by vertices in a face clockwise (!?! Might be reverse 2017-01-24)
-		faces.append((6,7,3,2)) #-Y (Front)
-		faces.append((1,5,4,0)) #+Y (Back)
-		faces.append((2,3,1,0)) #+X (Right)
-		faces.append((7,6,4,5))	#-X (Left)
-		faces.append((4,6,2,0))	#+Z (Top)
-		faces.append((3,7,5,1))	#-Z (Bottom)
-
-		#Assign values to self
-		self.verts = verts 
-		self.edges = edges
-		self.faces = faces
-
 class NBrick:
 	'''
 	NBrick Brick class with a known number of subdivisions
 	'''
-	def __init__(self, base = Brick(), subdivs = 1):
+	def __init__(self, base = (4,4,2), subdivs = 1):
 		'''
 		Construct using a Brick and desired number of subdivisions
 		base - Brick object to base length, width, and height off of
@@ -126,8 +76,8 @@ class NBrick:
 		faceIndex = 0
 
 		#Lambdas defining single axis coordinate positioning
-		posit = lambda n, m: -self.base.lwh[n]/2 + (m * (self.base.lwh[n])/self.subdivs)
-		facet = lambda n, m: (self.base.lwh[n]/2) * (-1 if m%2 == 0 else 1)
+		posit = lambda n, m: -self.base[n]/2 + (m * (self.base[n])/self.subdivs)
+		facet = lambda n, m: (self.base[n]/2) * (-1 if m%2 == 0 else 1)
 
 		#Each face of a cuboid
 		while(faceIndex < 6):
@@ -232,39 +182,66 @@ class BrickGeneratorOperator(bpy.types.Operator):
 		bm.to_mesh(mesh)
 		bm.free()
 
-	def execute(self, context):
+	def newBrick(self, length=length, width=width, height=height, subds=subds, intensity=intensity, seed=seed, location=bpy.context.scene.cursor_location):
 		#Create mesh data
 		mesh_data = bpy.data.meshes.new("brick_mesh_data")
-		br = Brick(self.length, self.width, self.height)
-		samp_brick = NBrick(br, self.subds)
+		br = (length, width, height)
+		samp_brick = NBrick(br, subds)
 		samp_brick.genMeshData()
 		mesh_data.from_pydata(samp_brick.verts, samp_brick.edges, samp_brick.faces)
-		self.randVertsBMesh(mesh_data, self.intensity, self.seed)
-
+		self.randVertsBMesh(mesh_data, intensity, seed)
 		mesh_data.update()
 
 		#create blender object
 		obj = bpy.data.objects.new("Brick", mesh_data)
-		obj.location = bpy.context.scene.cursor_location
+		obj.location = location
 
 		#Link object to mesh data
 		scene = bpy.context.scene
 		scene.objects.link(obj)
 
+	def execute(self, context):
+		self.newBrick()
 		return {'FINISHED'}
+
+class WallGeneratorOperator(bpy.types.Operator):
+	bl_idname = "object.brick_wall"
+	bl_label = "Brick Wall"
+	bl_options = {'REGISTER', 'UNDO'}
+	
+	def execute(self, context):
+		return {'FINISHED'}
+
+##################################
+#!    USER INTERFACE BUTTONS    !#
+##################################
+
+def add_Brick_button(self, context):
+	'''
+	Add Brick button for Add menu
+	'''
+	self.layout.operator(
+		BrickGeneratorOperator.bl_idname,
+		text = "Brick",
+		icon = "MOD_MIRROR") #Find a better icon
 
 ##################################
 #! REGISTER & UNREGISTER BLOCKS !#
 ##################################
 
 def register():
+	#Operators
 	bpy.utils.register_class(BrickGeneratorOperator)
+	#Buttons
+	bpy.types.INFO_MT_add.append(add_Brick_button)
+	#Keymaps
 	wm = bpy.context.window_manager
 	km = wm.keyconfigs.addon.keymaps.new(name='Object Mode', space_type='EMPTY')
 	addon_keymaps.append(km)
 	
 def unregister():
 	bpy.utils.unregister_class(BrickGeneratorOperator)
+	bpy.types.INFO_MT_add.remove(add_Brick_button)
 	addon_keymaps.clear()
 
 if __name__ == "__main__":
