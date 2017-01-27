@@ -47,6 +47,14 @@ addon_keymaps = []
 #!       CLASS DEFINITIONS      !#
 ##################################
 
+class Tile:
+	def __init__(self, base=(4,4,2), subdivs = 1):
+		self.base = base
+		self.subdivs = subdivs
+
+	def genMeshData(self):
+		pass
+
 class NBrick:
 	'''
 	NBrick Brick class with a known number of subdivisions
@@ -262,6 +270,7 @@ if __name__ == "__main__":
 	
 	lsX = []
 	lsY = []
+	lsZ = []
 
 	while(index <= maxi['X']):
 		lsX.append(index)
