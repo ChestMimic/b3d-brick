@@ -20,7 +20,7 @@ bl_info = {
 	"name":"Brick",
 	"description":"Generates bricks and nontextured brick structures",
 	"tracker_url":"https://github.com/ibbolia/b3d-brick/issues",
-	"version":(0,2,0),
+	"version":(0,3,0),
 	"blender":(2,78,0),
 	"support":"TESTING",
 	"category":"Objects",
@@ -258,32 +258,3 @@ def unregister():
 
 if __name__ == "__main__":
 	register()
-
-	points = [
-	(1,1),
-	(0,0),
-	(0,1),
-	(13,-4)]
-
-	mini = getMin(points)
-	maxi = getMax(points)
-	bSize = .5
-
-	index = mini['X']
-	print(index)
-	
-	lsX = []
-	lsY = []
-	lsZ = []
-
-	while(index <= maxi['X']):
-		lsX.append(index)
-		index = float(index) + bSize
-
-	index = mini['Y']
-	while(index <= maxi['Y']):
-		lsY.append(index)
-		index = index + bSize
-
-	print(lsX)
-	print(lsY)

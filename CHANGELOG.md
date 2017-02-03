@@ -14,6 +14,7 @@ All notable changes will be tracked in this file
 
 ###Removed
 - References to original Brick class
+- Excess code in __main__ call
 
 ##[0.2] - 2017-01-24
 ###Added
